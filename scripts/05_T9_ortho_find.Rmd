@@ -1,0 +1,151 @@
+### Teniendo T9 como referencia, se buscan sus ortólogos en todos los genomas de interés
+#T. afroharzianum Th6
+```{r setup, include=FALSE}
+# Load necessary libraries
+library(tidyverse)
+library(writexl)
+```
+
+# T. harzianum M10
+```{r setup, include=FALSE}
+# READ M10
+T9_M10_normalized <- read.csv("/Volumes/TOSHIBA EXT/TRICHODERMA/Genomes_fungi/outputs/statistics/final_snpcounts/norm_data/T9_M10_norm.txt", header = TRUE, sep = "\t")
+
+# FILTER T9_M10_normalized for outliers
+T9_M10_normalized <- T9_M10_normalized |> 
+  select(GeneID, count_percentage) |> 
+  filter(count_percentage >= 10.158)
+
+T9_M10_normalized$GeneID <- gsub("g", "", T9_M10_normalized$GeneID)
+
+# READ T9
+T9_ortho <- read.csv("~/Desktop/Bioinformatics/Hongos/T9_new/T9-Ortho/Trichoderma_harzianum_T9__v__Trichoderma_harzianum_M10.csv", header = TRUE, sep = ",")
+
+# FILTER T9_ortho
+T9_ortho <- T9_ortho |> 
+  select(Trichoderma_harzianum_M10, Trichoderma_harzianum_T9)
+
+T9_ortho$Trichoderma_harzianum_M10 <- gsub("TharziM10_", "", T9_ortho$Trichoderma_harzianum_M10) 
+T9_ortho$Trichoderma_harzianum_M10 <- gsub("\\.t[1234]", "", T9_ortho$Trichoderma_harzianum_M10) 
+colnames(T9_ortho) <- c("GeneID_M10", "Trichoderma_harzianum_T9")
+
+# Filter the rows in T9_ortho based on T9_M10_normalized$GeneID
+filtered_data <- T9_ortho %>%
+  filter(GeneID_M10 %in% T9_M10_normalized$GeneID)
+
+# Split comma-separated GeneID_M10 values into individual rows
+T9_ortho <- T9_ortho %>%
+  separate_rows(GeneID_M10, sep = ",") %>%
+  mutate(GeneID_M10 = trimws(GeneID_M10))
+
+# Left join with T9_M10_normalized to get the count_percentage and ensure all GeneID_M10 are included
+filtered_data <- T9_M10_normalized %>%
+  left_join(T9_ortho, by = c("GeneID" = "GeneID_M10"))
+
+# Add "Null" to Trichoderma_harzianum_T9 if GeneID_M10 is not found in Trichoderma_harzianum_T9
+filtered_data <- filtered_data %>%
+  mutate(Trichoderma_harzianum_T9 = ifelse(is.na(Trichoderma_harzianum_T9), "Null", Trichoderma_harzianum_T9))
+
+# Order by count_percentage
+filtered_data <- filtered_data %>%
+  arrange(desc(count_percentage))
+
+# Write the filtered data to a .txt file
+write.table(filtered_data, "~/Desktop/Bioinformatics/Hongos/T9_new/T9-Ortho/ortho-complete/M10_T9_ortho.txt", sep="\t", row.names=FALSE, col.names=TRUE, quote=FALSE)
+```
+
+# T. harzianum T22
+```{r setup, include=FALSE}
+# READ T22
+T9_T22_normalized <- read.csv("/Volumes/TOSHIBA EXT/TRICHODERMA/Genomes_fungi/outputs/statistics/final_snpcounts/norm_data/T9_T22_norm.txt", header = TRUE, sep = "\t")
+
+# FILTER T9_T22_normalized for outliers
+T9_T22_normalized <- T9_T22_normalized |> 
+  select(GeneID, count_percentage) |> 
+  filter(count_percentage >= 10.7431)
+
+T9_T22_normalized$GeneID <- gsub("g", "", T9_T22_normalized$GeneID)
+
+# READ T9
+T9_ortho <- read.csv("~/Desktop/Bioinformatics/Hongos/T9_new/T9-Ortho/Trichoderma_harzianum_T9__v__Trichoderma_harzianum_T22.csv", header = TRUE, sep = ",")
+
+# FILTER T9_ortho
+T9_ortho <- T9_ortho |> 
+  select(Trichoderma_harzianum_T22, Trichoderma_harzianum_T9)
+
+T9_ortho$Trichoderma_harzianum_T22 <- gsub("TharziM10_", "", T9_ortho$Trichoderma_harzianum_T22) 
+T9_ortho$Trichoderma_harzianum_T22 <- gsub("\\.t[1234]", "", T9_ortho$Trichoderma_harzianum_T22) 
+colnames(T9_ortho) <- c("GeneID_T22", "Trichoderma_harzianum_T9")
+
+# Filter the rows in T9_ortho based on T9_M10_normalized$GeneID
+filtered_data <- T9_ortho %>%
+  filter(GeneID_T22 %in% T9_T22_normalized$GeneID)
+
+# Split comma-separated GeneID_T22 values into individual rows
+T9_ortho <- T9_ortho %>%
+  separate_rows(GeneID_T22, sep = ",") %>%
+  mutate(GeneID_T22 = trimws(GeneID_M10))
+
+# Left join with T9_M10_normalized to get the count_percentage and ensure all GeneID_M10 are included
+filtered_data <- T9_T22_normalized %>%
+  left_join(T9_ortho, by = c("GeneID" = "GeneID_T22"))
+
+# Add "Null" to Trichoderma_harzianum_T9 if GeneID_T22 is not found in Trichoderma_harzianum_T9
+filtered_data <- filtered_data %>%
+  mutate(Trichoderma_harzianum_T9 = ifelse(is.na(Trichoderma_harzianum_T9), "Null", Trichoderma_harzianum_T9))
+
+# Order by count_percentage
+filtered_data <- filtered_data %>%
+  arrange(desc(count_percentage))
+
+# Write the filtered data to a .txt file
+write.table(filtered_data, "~/Desktop/Bioinformatics/Hongos/T9_new/T9-Ortho/ortho-complete/T22_T9_ortho.txt", sep="\t", row.names=FALSE, col.names=TRUE, quote=FALSE)
+```
+
+#T. harzianum Th0179
+```{r setup, include=FALSE}
+# READ Th0179
+T9_Th0179_normalized <- read.csv("/Volumes/TOSHIBA EXT/TRICHODERMA/Genomes_fungi/outputs/statistics/final_snpcounts/norm_data/T9_Th0179_norm.txt", header = TRUE, sep = "\t")
+
+# FILTER T9_Th0179_normalized for outliers
+T9_Th0179_normalized <- T9_Th0179_normalized |> 
+  select(GeneID, count_percentage) |> 
+  filter(count_percentage >= 10.1694)
+
+T9_Th0179_normalized$GeneID <- gsub("g", "", T9_Th0179_normalized$GeneID)
+
+# READ T9
+T9_ortho <- read.csv("~/Desktop/Bioinformatics/Hongos/T9_new/T9-Ortho/Trichoderma_harzianum_T9__v__Trichoderma_harzianum_Th0179.csv", header = TRUE, sep = ",")
+
+# FILTER T9_ortho
+T9_ortho <- T9_ortho |> 
+  select(Trichoderma_harzianum_Th0179, Trichoderma_harzianum_T9)
+
+T9_ortho$Trichoderma_harzianum_Th0179 <- gsub("TharziTh0179_", "", T9_ortho$Trichoderma_harzianum_Th0179) 
+T9_ortho$Trichoderma_harzianum_Th0179 <- gsub("\\.t[1234]", "", T9_ortho$Trichoderma_harzianum_Th0179) 
+colnames(T9_ortho) <- c("GeneID_Th0179", "Trichoderma_harzianum_T9")
+
+# Filter the rows in T9_ortho based on T9_Th0179_normalized$GeneID
+filtered_data <- T9_ortho %>%
+  filter(GeneID_Th0179 %in% T9_Th0179_normalized$GeneID)
+
+# Split comma-separated GeneID_Th0179 values into individual rows
+T9_ortho <- T9_ortho %>%
+  separate_rows(GeneID_Th0179, sep = ",") %>%
+  mutate(GeneID_Th0179 = trimws(GeneID_Th0179))
+
+# Left join with T9_Th0179_normalized to get the count_percentage and ensure all GeneID_M10 are included
+filtered_data <- T9_Th0179_normalized %>%
+  left_join(T9_ortho, by = c("GeneID" = "GeneID_Th0179"))
+
+# Add "Null" to Trichoderma_harzianum_T9 if GeneID_Th0179 is not found in Trichoderma_harzianum_T9
+filtered_data <- filtered_data %>%
+  mutate(Trichoderma_harzianum_T9 = ifelse(is.na(Trichoderma_harzianum_T9), "Null", Trichoderma_harzianum_T9))
+
+# Order by count_percentage
+filtered_data <- filtered_data %>%
+  arrange(desc(count_percentage))
+
+# Write the filtered data to a .txt file
+write.table(filtered_data, "~/Desktop/Bioinformatics/Hongos/T9_new/T9-Ortho/ortho-complete/Th0179_T9_ortho.txt", sep="\t", row.names=FALSE, col.names=TRUE, quote=FALSE)
+```

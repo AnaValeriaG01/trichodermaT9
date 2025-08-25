@@ -1,0 +1,111 @@
+---
+output: pdf_document
+---
+# DOWNLOAD DATA AND PREPARE FOR ANALYSIS
+```{r expensive-chunk, message=FALSE, warning=FALSE, cache=TRUE}
+library(tidyverse)
+library(dplyr)
+
+# Create paths to access VCF and .gff files
+pathvcf<-"/Users/anagarcia/Desktop/Bioinformatics/vcfs-Trichoderma/T9_harzTR274_final_variants.vcf"
+pathann<-"/Users/anagarcia/Desktop/Bioinformatics/vcfs-Trichoderma/anotaciones_estructurales_2024_finales_all/Trichoderma_harzianum_TR274.gff3"
+
+# Read vcf files (T9 with harzianum TR274)
+vcf_data <- read.table(pathvcf, header = FALSE, sep = "\t", stringsAsFactors = FALSE)
+
+
+# Read reference genomes annotation files (harzianum TR274)
+gff <- read.table(pathann, 
+                  header = FALSE, sep="\t", stringsAsFactors = FALSE)
+
+# Filter annotation file to only have genes and clean the data
+genes <- subset(gff, gff$V3 == "gene")
+genes$V9 <- factor(gsub(";.*", "", genes$V9))
+genes$V9 <- factor(gsub("ID=", "", genes$V9))
+
+# Extract gene annotations and positions and name each column.
+gene_annotations <- genes[,c(1,9,4,5)]
+colnames(gene_annotations) <- c("Seqname","GeneID", "Start", "End")
+
+# Define a function to check if a position is within a gene
+is_within_gene <- function(pos, gene_start, gene_end)
+  {
+  return(pos >= gene_start & pos <= gene_end)
+  } 
+
+# Initialize a vector for counting variants per gene
+gene_variant_counts <- rep(0, nrow(gene_annotations))
+```
+
+# COUNT NUMBER OF VARIANTS PER GENE
+```{r cache=TRUE}
+# Load the progress bar library
+library(progress)
+
+# Initialize the progress bar
+total_iterations <- sum(sapply(split.data.frame(vcf_data, f = vcf_data$V1), nrow))
+pb <- progress_bar$new(
+  format = "  Processing [:bar] :percent eta: :eta",  
+  total = total_iterations, clear = FALSE, width = 60
+)
+# Iterate over each variant in the VCF file
+vcf_splited <- split.data.frame(vcf_data, f = vcf_data$V1)
+
+# Iterate over each seqname in genes$V1
+for (seqname in unique(genes$V1)) {
+  
+  # Get vcf_seq and gene_seq for current seqname
+  vcf_seq <- vcf_splited[[seqname]]
+  gene_seq <- subset(genes, genes$V1 == seqname)
+  
+  # Check if vcf_seq is empty or not a data frame
+  if (!is.data.frame(vcf_seq) || nrow(vcf_seq) == 0) {
+    cat("No hay datos válidos para", seqname, "\n")
+    next  # Skip to the next seqname
+  }
+
+   for (i in 1:nrow(vcf_seq)) {
+      pos <- as.numeric(vcf_seq$V2[i])
+      gene_starts <- as.numeric(gene_seq$V4)
+      gene_end <- as.numeric(gene_seq$V5)
+    
+     for (j in 1:length(gene_seq$V9) ){
+      
+        if(is_within_gene(pos, gene_starts[j], gene_end[j])){
+         idx <- which(genes$V1 == seqname & genes$V9 == gene_seq$V9[j])
+          gene_variant_counts[idx] <- gene_variant_counts[idx] + 1
+        }
+      }
+    # Update the progress bar
+    pb$tick()
+  }
+}
+```
+
+# MAKE AND SAVE RESULTS IN A DATA FRAME
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+# Make path to save data frame of results
+pathSNP<-"/Volumes/TOSHIBA EXT/TRICHODERMA/Genomes_fungi/outputs/statistics/final_snpcounts/snps_T9_harzTR274.txt"
+# Create a Data Frame with Gene Annotations and Variant Counts:
+result <- data.frame(Scaffold = gene_annotations$Seqname,
+                     GeneID = gene_annotations$GeneID,
+                     Changes = gene_variant_counts)
+
+# Save the data frame
+write.table(result,file=pathSNP, sep="\t")
+```
+
+# NORMALIZE BASED ON GENE SIZE
+```{r}
+library(dplyr)
+normalized_results <- result |> 
+  inner_join(gene_annotations, by = "GeneID") |> 
+  select(-Seqname) |> 
+  mutate(count_percentage = (Changes)/(End - Start)*100) |> 
+  arrange(desc(count_percentage))
+
+head(normalized_results)
+write.table(normalized_results, file="/Volumes/TOSHIBA EXT/TRICHODERMA/Genomes_fungi/outputs/statistics/final_snpcounts/T9_TR274_norm.txt", sep="\t")
+
+```
