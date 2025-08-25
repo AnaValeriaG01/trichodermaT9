@@ -1,4 +1,4 @@
-TR274
+#TR274
 #Assuming FastQC and Trimmomatic steps are not necessary
 
 cd /home/garciav/Desktop/Trichoderma
@@ -31,9 +31,7 @@ vcfutils.pl varFilter outputs/results/vcf/T9_harzTR274_variants.vcf > outputs/re
 
 echo "Pipeline completed successfully!"
 
-____________________
-
-Th0179
+#Th0179
 #Assuming FastQC and Trimmomatic steps are not necessary 
 
 cd /home/garciav/Desktop/Trichoderma
@@ -66,9 +64,7 @@ vcfutils.pl varFilter outputs/results/vcf/T9_harzTh0179_variants.vcf > outputs/r
 
 echo "Pipeline completed successfully!"
 
-____________________
-
-Th3844
+#Th3844
 #Assuming FastQC and Trimmomatic steps are not necessary 
 
 cd /home/garciav/Desktop/Trichoderma
@@ -101,9 +97,7 @@ vcfutils.pl varFilter outputs/results/vcf/T9_harzTh3844_variants.vcf > outputs/r
 
 echo "Pipeline completed successfully!"
 
-____________________
-
-M10
+#M10
 #Assuming FastQC and Trimmomatic steps are not necessary 
 
 cd /home/garciav/Desktop/Trichoderma
@@ -135,9 +129,8 @@ echo "Filtering variants..."
 vcfutils.pl varFilter outputs/results/vcf/T9_M10_variants.vcf > outputs/results/vcf/T9_M10_final_variants.vcf
 
 echo "Pipeline completed successfully!"
-____________________
 
-T22
+#T22
 #Assuming FastQC and Trimmomatic steps are not necessary 
 
 cd /home/garciav/Desktop/Trichoderma
@@ -169,9 +162,8 @@ echo "Filtering variants..."
 vcfutils.pl varFilter outputs/results/vcf/T9_T22_variants.vcf > outputs/results/vcf/T9_T22_final_variants.vcf
 
 echo "Pipeline completed successfully!"
-____________________
 
-CBS
+#CBS
 #Assuming FastQC and Trimmomatic steps are not necessary 
 
 cd /home/garciav/Desktop/Trichoderma
@@ -203,9 +195,8 @@ echo "Filtering variants..."
 vcfutils.pl varFilter outputs/results/vcf/3T9_harzCBS_variants.vcf > outputs/results/vcf/3T9_harzCBS_final_variants.vcf
 
 echo "Pipeline completed successfully!"
-____________________
 
-IMI206040
+#IMI206040
 #Assuming FastQC and Trimmomatic steps are not necessary 
 
 cd /home/garciav/Desktop/Trichoderma
@@ -238,9 +229,7 @@ vcfutils.pl varFilter outputs/results/vcf/T9_atroIMI206040_variants.vcf > output
 
 echo "Pipeline completed successfully!"
 
-____________________
-
-Guizhouense
+#Guizhouense
 #Assuming FastQC and Trimmomatic steps are not necessary 
 
 cd /home/garciav/Desktop/Trichoderma
@@ -273,9 +262,7 @@ vcfutils.pl varFilter outputs/results/vcf/T9_guizhouense_variants.vcf > outputs/
 
 echo "Pipeline completed successfully!"
 
-____________________
-
-Th6
+#Th6
 #Assuming FastQC and Trimmomatic steps are not necessary 
 
 cd /home/garciav/Desktop/Trichoderma
